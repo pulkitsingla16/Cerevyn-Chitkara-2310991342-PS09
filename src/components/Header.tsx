@@ -1,14 +1,23 @@
-import { Sparkles, RotateCcw } from 'lucide-react'
+import { Sparkles, RotateCcw, Volume2, VolumeX, HelpCircle } from 'lucide-react'
 
 import { getDifficultyColor, getDifficultyLabel } from '../game/config'
 import type { Difficulty } from '../game/types'
 
 interface HeaderProps {
   difficulty: Difficulty
+  soundEnabled?: boolean
+  onToggleSound?: () => void
+  onOpenRules?: () => void
   onRestart: () => void
 }
 
-export function Header({ difficulty, onRestart }: HeaderProps) {
+export function Header({
+  difficulty,
+  soundEnabled = true,
+  onToggleSound,
+  onOpenRules,
+  onRestart,
+}: HeaderProps) {
   const diffColor = getDifficultyColor(difficulty)
 
   return (
@@ -24,10 +33,36 @@ export function Header({ difficulty, onRestart }: HeaderProps) {
       </div>
 
       <div className="topbar-meta">
+        {onOpenRules && (
+          <button
+            type="button"
+            className="rules-pill-btn"
+            onClick={onOpenRules}
+            aria-label="Game rules and how to play"
+            title="How to play"
+          >
+            <HelpCircle size={15} />
+            <span>Rules</span>
+          </button>
+        )}
+
+        {onToggleSound && (
+          <button
+            type="button"
+            className={`sound-toggle-btn ${soundEnabled ? 'active' : 'muted'}`}
+            onClick={onToggleSound}
+            aria-label={soundEnabled ? 'Mute sound effects' : 'Unmute sound effects'}
+            title={soundEnabled ? 'Sound ON' : 'Sound OFF'}
+          >
+            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          </button>
+        )}
+
         <div className="difficulty-pill" aria-live="polite">
           <span className="label">Current Level</span>
           <strong style={{ color: diffColor }}>{getDifficultyLabel(difficulty)}</strong>
         </div>
+
         <button type="button" className="restart-btn" onClick={onRestart}>
           <RotateCcw size={16} aria-hidden="true" />
           <span>Restart round</span>

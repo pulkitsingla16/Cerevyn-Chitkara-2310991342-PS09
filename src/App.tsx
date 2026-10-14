@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AnalyticsModal } from './components/AnalyticsModal'
+import { ComboBanner } from './components/ComboBanner'
 import { Confetti } from './components/Confetti'
 import { ConfirmDialog } from './components/ConfirmDialog'
 import { DifficultyNotice } from './components/DifficultyNotice'
@@ -7,6 +8,7 @@ import { GameBoard } from './components/GameBoard'
 import { GameStats } from './components/GameStats'
 import { Header } from './components/Header'
 import { Instructions } from './components/Instructions'
+import { RulesModal } from './components/RulesModal'
 import { SessionHistory } from './components/SessionHistory'
 import { WinPanel } from './components/WinPanel'
 import type { Difficulty } from './game/types'
@@ -25,6 +27,8 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
     selectedIds,
     matchedIds,
     moves,
+    streak,
+    showReadyBanner,
     elapsedMs,
     status,
     completionSeconds,
@@ -33,6 +37,8 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
     isNewBest,
     bestScore,
     isPreviewing,
+    soundEnabled,
+    toggleSound,
     onCardClick,
     restartRound,
     startNextRound,
@@ -41,8 +47,10 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
     storageError,
     serverOnline,
   } = useMemoryGame(initialDifficulty, initialSeed)
+
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [analyticsOpen, setAnalyticsOpen] = useState(false)
+  const [rulesOpen, setRulesOpen] = useState(false)
 
   const boardLocked = selectedIds.length >= 2 || status === 'won'
   const totalPairs = useMemo(() => deck.length / 2, [deck.length])
@@ -59,7 +67,19 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
   return (
     <div className="app-shell">
       <Confetti active={status === 'won'} />
-      <Header difficulty={difficulty} onRestart={restartRound} />
+      <ComboBanner
+        streak={streak}
+        showReadyBanner={showReadyBanner}
+        difficultyLabel={difficulty}
+      />
+
+      <Header
+        difficulty={difficulty}
+        soundEnabled={soundEnabled}
+        onToggleSound={toggleSound}
+        onOpenRules={() => setRulesOpen(true)}
+        onRestart={restartRound}
+      />
 
       <main className="dashboard">
         <div className="main-column">
@@ -115,6 +135,7 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
       </main>
 
       <AnalyticsModal isOpen={analyticsOpen} onClose={() => setAnalyticsOpen(false)} />
+      <RulesModal isOpen={rulesOpen} onClose={() => setRulesOpen(false)} />
 
       <ConfirmDialog
         isOpen={confirmOpen}
