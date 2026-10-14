@@ -1,6 +1,6 @@
-import { RefreshCw } from 'lucide-react'
+import { Sparkles, RotateCcw } from 'lucide-react'
 
-import { getDifficultyLabel } from '../game/config'
+import { getDifficultyColor, getDifficultyLabel } from '../game/config'
 import type { Difficulty } from '../game/types'
 
 interface HeaderProps {
@@ -9,21 +9,28 @@ interface HeaderProps {
 }
 
 export function Header({ difficulty, onRestart }: HeaderProps) {
+  const diffColor = getDifficultyColor(difficulty)
+
   return (
     <header className="topbar">
-      <div>
-        <p className="eyebrow">Cerevyn Technical Assessment</p>
-        <h1>MemoryMatch</h1>
+      <div className="brand-group">
+        <div className="brand-badge">
+          <Sparkles size={13} className="sparkle-icon" />
+          <span>Cerevyn Technical Assessment • PS09</span>
+        </div>
+        <h1 className="game-title">
+          Memory<span>Match</span>
+        </h1>
       </div>
 
       <div className="topbar-meta">
         <div className="difficulty-pill" aria-live="polite">
-          <span className="label">Current difficulty</span>
-          <strong>{getDifficultyLabel(difficulty)}</strong>
+          <span className="label">Current Level</span>
+          <strong style={{ color: diffColor }}>{getDifficultyLabel(difficulty)}</strong>
         </div>
-        <button type="button" className="primary-button" onClick={onRestart}>
-          <RefreshCw size={16} aria-hidden="true" />
-          Restart round
+        <button type="button" className="restart-btn" onClick={onRestart}>
+          <RotateCcw size={16} aria-hidden="true" />
+          <span>Restart round</span>
         </button>
       </div>
     </header>

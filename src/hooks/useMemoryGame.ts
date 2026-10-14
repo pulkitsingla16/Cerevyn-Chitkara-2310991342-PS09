@@ -57,7 +57,9 @@ export function useMemoryGame(initialDifficulty: Difficulty = 'easy', initialSee
     const scores = readBestScores()
     return scores[initialDifficulty] ?? null
   })
-  const [isPreviewing, setIsPreviewing] = useState(false)
+  const [isPreviewing, setIsPreviewing] = useState<boolean>(() => {
+    return import.meta.env.MODE !== 'test'
+  })
   const previewTimeoutRef = useRef<number | null>(null)
 
   const deckRef = useRef(deck)
@@ -73,12 +75,10 @@ export function useMemoryGame(initialDifficulty: Difficulty = 'easy', initialSee
 
   // Optional brief startup reveal (Santa Tracker style) without locking user input
   useEffect(() => {
-    // Only flash preview in real browser environment, skip in automated test environment
     if (import.meta.env.MODE === 'test') {
       return
     }
 
-    setIsPreviewing(true)
     previewTimeoutRef.current = window.setTimeout(() => {
       setIsPreviewing(false)
       previewTimeoutRef.current = null
