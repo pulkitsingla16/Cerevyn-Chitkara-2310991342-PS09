@@ -1,0 +1,43 @@
+import { memo } from 'react'
+
+import type { MemoryCard as MemoryCardType } from '../game/types'
+
+interface MemoryCardProps {
+  card: MemoryCardType
+  isSelected: boolean
+  isMatched: boolean
+  isDisabled: boolean
+  onClick: (cardId: string) => void
+}
+
+export const MemoryCard = memo(function MemoryCard({
+  card,
+  isSelected,
+  isMatched,
+  isDisabled,
+  onClick,
+}: MemoryCardProps) {
+  const isFaceUp = isSelected || isMatched
+
+  return (
+    <div className="memory-card-scene">
+      <button
+        type="button"
+        className={`memory-card ${isFaceUp ? 'flipped' : ''} ${isMatched ? 'matched' : ''}`}
+        onClick={() => onClick(card.id)}
+        disabled={isDisabled || isMatched}
+        aria-label={isFaceUp ? `Revealed card: ${card.symbol}` : 'Hidden card'}
+        aria-pressed={isFaceUp}
+        data-card-id={card.id}
+      >
+        <div className="card-face card-back">
+          <span aria-hidden="true">?</span>
+        </div>
+        <div className={`card-face card-front ${isMatched ? 'card-matched' : ''}`}>
+          <span aria-hidden="true">{card.symbol}</span>
+        </div>
+      </button>
+    </div>
+  )
+})
+

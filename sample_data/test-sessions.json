@@ -1,0 +1,47 @@
+[
+  {
+    "id": "session-001",
+    "difficulty": "easy",
+    "moves": 14,
+    "completedPairs": 8,
+    "completionSeconds": 42.5,
+    "status": "completed",
+    "timestamp": "2026-09-15T10:00:00.000Z"
+  },
+  {
+    "id": "session-002",
+    "difficulty": "easy",
+    "moves": 18,
+    "completedPairs": 8,
+    "completionSeconds": 58.2,
+    "status": "completed",
+    "timestamp": "2026-09-15T10:20:00.000Z"
+  },
+  {
+    "id": "session-003",
+    "difficulty": "medium",
+    "moves": 24,
+    "completedPairs": 10,
+    "completionSeconds": 78.4,
+    "status": "completed",
+    "timestamp": "2026-09-16T08:45:00.000Z"
+  },
+  {
+    "id": "session-004",
+    "difficulty": "hard",
+    "moves": 29,
+    "completedPairs": 12,
+    "completionSeconds": 101.8,
+    "status": "completed",
+    "timestamp": "2026-09-17T12:15:00.000Z"
+  },
+  {
+    "id": "session-005",
+    "difficulty": "easy",
+    "moves": 20,
+    "completedPairs": 8,
+    "completionSeconds": 67.1,
+    "status": "completed",
+    "timestamp": "2026-09-18T14:00:00.000Z"
+  }
+]
