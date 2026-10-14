@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-
+import { AnalyticsModal } from './components/AnalyticsModal'
 import { Confetti } from './components/Confetti'
 import { ConfirmDialog } from './components/ConfirmDialog'
 import { DifficultyNotice } from './components/DifficultyNotice'
@@ -39,8 +39,10 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
     history,
     clearHistory,
     storageError,
+    serverOnline,
   } = useMemoryGame(initialDifficulty, initialSeed)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [analyticsOpen, setAnalyticsOpen] = useState(false)
 
   const boardLocked = selectedIds.length >= 2 || status === 'won'
   const totalPairs = useMemo(() => deck.length / 2, [deck.length])
@@ -102,14 +104,22 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
 
         <aside className="side-column">
           <Instructions />
-          <SessionHistory history={history} storageError={storageError} onClearHistory={handleClearHistory} />
+          <SessionHistory
+            history={history}
+            storageError={storageError}
+            serverOnline={serverOnline}
+            onClearHistory={handleClearHistory}
+            onOpenAnalytics={() => setAnalyticsOpen(true)}
+          />
         </aside>
       </main>
+
+      <AnalyticsModal isOpen={analyticsOpen} onClose={() => setAnalyticsOpen(false)} />
 
       <ConfirmDialog
         isOpen={confirmOpen}
         title="Clear session history"
-        message="This removes the saved anonymous round results from browser storage. Continue?"
+        message="This removes the saved anonymous round results from browser storage and server database. Continue?"
         onConfirm={confirmClearHistory}
         onCancel={() => setConfirmOpen(false)}
       />

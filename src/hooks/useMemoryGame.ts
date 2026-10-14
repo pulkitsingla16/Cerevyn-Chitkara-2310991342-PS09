@@ -71,7 +71,7 @@ export function useMemoryGame(initialDifficulty: Difficulty = 'easy', initialSee
   const startedAtRef = useRef<number | null>(null)
   const mismatchEpochRef = useRef(0)
   const lockRef = useRef(false)
-  const { history, storageError, appendSession, clearHistory } = useSessionHistory()
+  const { history, storageError, serverOnline, appendSession, clearHistory } = useSessionHistory()
 
   // Optional brief startup reveal (Santa Tracker style) without locking user input
   useEffect(() => {
@@ -320,6 +320,7 @@ export function useMemoryGame(initialDifficulty: Difficulty = 'easy', initialSee
     restartRound,
     startNextRound,
     storageError,
+    serverOnline,
     history,
     clearHistory,
   }

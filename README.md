@@ -33,29 +33,37 @@ I chose a **client-side React + TypeScript** architecture to keep the applicatio
 - Seeded shuffle support for deterministic tests and demos
 - Move, timer, and completion tracking
 - Three-level adaptive difficulty with visible explanations
-- Versioned localStorage session history with validation and clear support
-- Keyboard-accessible controls and modern dark interface
+- Dual persistence: Node.js Express server DB (`data/sessions.json`) with automatic browser localStorage offline fallback
+- Global Server Telemetry & Analytics modal dialog (with round averages and server leaderboard)
+- Containerized deployment ready via multi-stage production Dockerfile
+- Versioned session history with sync indicator and clear support
+- Keyboard-accessible controls and modern arcade-inspired dark interface
 
 ## Technology stack
 
 | Layer | Technology |
 |---|---|
-| Framework | React 19 + TypeScript 6 |
-| Build tool | Vite 8 |
-| Test runner | Vitest 5 + React Testing Library + jsdom |
-| Linting | ESLint + TypeScript strict checks |
-| Persistence | Browser localStorage (versioned, validated) |
+| Frontend Framework | React 19 + TypeScript 6 |
+| Build Tool | Vite 8 |
+| Backend Server | Node.js Express 5 + RESTful APIs |
+| Database / Persistence | Persistent JSON DB (`data/sessions.json`) + localStorage fallback |
+| Containerization | Multi-stage Docker (`Dockerfile` + `.dockerignore`) |
+| Test Runner | Vitest 5 + Supertest (Real HTTP Integration) + RTL |
+| Linting | ESLint 10 + TypeScript strict checks |
 | Icons | lucide-react |
-| CI/CD | GitHub Actions |
-| Hosting target | Azure Static Web Apps |
+| CI/CD | GitHub Actions (automated test, lint, and build on push) |
+| Hosting Target | Azure Static Web Apps / Azure Container Apps / Docker |
 
 ## Prerequisites
 
 - Node.js 22.12+ (or 24+)
 - npm 10+
 - A modern browser (Chrome, Firefox, Edge, Safari)
+- Optional: Docker engine (for containerized runs)
 
 ## Setup and run instructions
+
+### Running in Development
 
 ```bash
 # 1. Clone the repository
@@ -65,19 +73,34 @@ cd Cerevyn-Chitkara-2310991342-PS09
 # 2. Install dependencies
 npm install
 
-# 3. Start the development server
-npm run dev
-# Open http://localhost:5173 in a browser
+# 3. Start the Backend Server (Terminal 1)
+npm run server
+# Backend runs at http://localhost:3001 with REST API & Telemetry
 
-# 4. Run the full test suite
+# 4. Start the Frontend Dev Server (Terminal 2)
+npm run dev
+# Open http://localhost:5173 in your browser
+
+# 5. Run full test suite (26 integration & unit tests)
 npm test
 
-# 5. Lint and type-check
+# 6. Lint and type-check
 npm run lint
 npm run typecheck
 
-# 6. Production build
+# 7. Production build
 npm run build
+```
+
+### Running with Docker
+
+```bash
+# Build production image
+docker build -t memorymatch:latest .
+
+# Run container (serves frontend + backend on port 3001)
+docker run -p 3001:3001 memorymatch:latest
+# Open http://localhost:3001 in your browser
 ```
 
 ## Game rules
