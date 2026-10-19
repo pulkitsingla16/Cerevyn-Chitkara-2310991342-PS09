@@ -81,7 +81,7 @@ npm run server
 npm run dev
 # Open http://localhost:5173 in your browser
 
-# 5. Run full test suite (26 integration & unit tests)
+# 5. Run full test suite (27 integration & unit tests)
 npm test
 
 # 6. Lint and type-check
@@ -200,9 +200,9 @@ The deck generator accepts an optional numeric seed. When provided, a determinis
 | `shuffle.test.ts` | 5 | Deck sizes, pair counts, deterministic seeding, different seeds differ |
 | `storage.test.ts` | 4 | Persist + reload, malformed JSON fallback, quota failure, clear confirmation |
 | `timer-restart.test.tsx` | 1 | Timer starts on first click, resets to 0.0s on restart |
-| `game-ui.test.tsx` | 4 | Match persistence, mismatch hide delay, repeat-click guard, matched-card guard |
-| `api.test.ts` | 5 | Backend health endpoint, rules metadata, session persistence, payload validation, global telemetry aggregates |
-| **Total** | **26** | **100% pass across 6 test suites** |
+| `game-ui.test.tsx` | 5 | Match persistence, exact move count assertions, 450ms mismatch hide, repeat-click guard, mismatch restart safety |
+| `api.test.ts` | 5 | Backend health endpoint, rules metadata, session persistence without IP exposure, invalid payload/range 400 rejection, global telemetry aggregates |
+| **Total** | **27** | **27 automated tests passing across 6 test suites** |
 
 ## Demonstration scenarios
 

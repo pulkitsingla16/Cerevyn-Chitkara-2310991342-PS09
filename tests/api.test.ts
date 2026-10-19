@@ -1,10 +1,20 @@
 import request from 'supertest'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest'
 import { app } from '../server/src/app'
 
 describe('MemoryMatch Backend REST API', () => {
   beforeEach(async () => {
-    // Clear sessions in test environment
+    // Clear sessions in test environment before each test
+    await request(app).delete('/api/game/sessions')
+  })
+
+  afterEach(async () => {
+    // Ensure test data does not linger after each test
+    await request(app).delete('/api/game/sessions')
+  })
+
+  afterAll(async () => {
+    // Final cleanup leaving runtime storage empty
     await request(app).delete('/api/game/sessions')
   })
 

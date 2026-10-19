@@ -177,10 +177,12 @@ app.get('/api/game/analytics', (_req: Request, res: Response) => {
 
 // Clear sessions - restricted to authenticated admin or test environment
 app.delete('/api/game/sessions', (req: Request, res: Response) => {
-  const adminKey = req.headers['x-admin-key']
   const isTest = process.env.NODE_ENV === 'test'
+  const adminKey = req.headers['x-admin-key']
+  const configuredSecret = process.env.ADMIN_KEY
 
-  if (!isTest && adminKey !== (process.env.ADMIN_KEY || 'test-admin-key')) {
+  // In production, fail closed: reject if ADMIN_KEY is not explicitly set or does not match
+  if (!isTest && (!configuredSecret || adminKey !== configuredSecret)) {
     return res.status(403).json({
       success: false,
       error: 'Unauthorized. Clearing global server session history is restricted.',

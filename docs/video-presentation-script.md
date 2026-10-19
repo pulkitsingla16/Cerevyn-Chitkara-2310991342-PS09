@@ -11,7 +11,7 @@
 - **Spoken Script:**  
   *"Hello, my name is Pulkit Singla, Roll Number 2310991342 from Chitkara University. Today I am presenting my solution for Problem Statement 09 (PS09): The Adaptive Memory Matching Game for the Cerevyn assessment.*  
   *The core challenge of PS09 is creating a memory matching game that tracks player performance in real time and automatically adapts the difficulty of the next round based on explicit rules and clear feedback.*  
-  *My solution is built using React 19, TypeScript, and Vite on the frontend, with a Node.js Express telemetry backend, dual-mode persistence, and 100% test coverage with 26 automated unit and integration tests."*
+  *My solution is built using React 19, TypeScript, and Vite on the frontend, with a Node.js Express telemetry backend, dual-mode persistence, and 27 automated unit and integration tests."*
 
 ---
 
@@ -49,6 +49,6 @@
 ### Segment 5: Testing, Cloud Deployment & Conclusion (3:45 – 4:30)
 - **Visual:** Show the GitHub repository, passing GitHub Actions CI workflows, and test summary.
 - **Spoken Script:**  
-  *"Finally, regarding software engineering rigor: the codebase includes 26 automated tests across 6 suites verifying deck shuffle math, deterministic seeds, storage boundary conditions, timer safety, UI lifecycles, and backend REST APIs.*  
-  *The project is deployed multi-cloud: hosted 24/7 on GitHub Pages CDN for zero latency and verified on Microsoft Azure App Service.*  
+  *"Finally, regarding software engineering rigor: the codebase includes 27 automated tests across 6 suites verifying deck shuffle math, deterministic seeds, storage boundary conditions, timer safety, UI lifecycles, and backend REST APIs.*  
+  *The project is deployed multi-cloud: hosted on GitHub Pages CDN for high availability and verified on Microsoft Azure App Service.*  
   *Thank you for reviewing my project, and I look forward to contributing to Cerevyn as a Software Development Trainee."*
