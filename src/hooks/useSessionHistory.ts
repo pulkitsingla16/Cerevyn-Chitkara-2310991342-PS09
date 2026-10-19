@@ -3,7 +3,12 @@ import { useCallback, useEffect, useState } from 'react'
 import { clearStoredSessions, readStoredSessions, saveStoredSessions } from '../services/storage'
 import type { SessionRecord } from '../game/types'
 
-const API_BASE = 'http://localhost:3001/api/game'
+const isBrowser = typeof window !== 'undefined'
+const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+const API_BASE = (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ||
+  (isLocal
+    ? 'http://localhost:3001/api/game'
+    : 'https://cerevyn-memorymatch-2310991342-ajfmebfjcchrbhdx.indiasouthcentral-01.azurewebsites.net/api/game')
 
 export function useSessionHistory() {
   const [history, setHistory] = useState<SessionRecord[]>(() => readStoredSessions())

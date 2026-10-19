@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { BarChart3, Database, X, RefreshCw, Trophy } from 'lucide-react'
+import { BarChart3, Database, X, RefreshCw, Trophy, HardDrive } from 'lucide-react'
+import { readStoredSessions } from '../services/storage'
 
 interface AnalyticsData {
   success: boolean
@@ -25,30 +26,63 @@ interface AnalyticsModalProps {
   onClose: () => void
 }
 
+function computeLocalAnalytics(): AnalyticsData {
+  const localSessions = readStoredSessions()
+  const completed = localSessions.filter((s) => s.status === 'completed')
+  const totalRounds = completed.length
+  const totalMoves = completed.reduce((acc, curr) => acc + curr.moves, 0)
+  const totalSeconds = completed.reduce((acc, curr) => acc + curr.completionSeconds, 0)
+
+  return {
+    success: true,
+    totalRounds,
+    averageMovesOverall: totalRounds > 0 ? Number((totalMoves / totalRounds).toFixed(1)) : 0,
+    averageSecondsOverall: totalRounds > 0 ? Number((totalSeconds / totalRounds).toFixed(1)) : 0,
+    distribution: {
+      easy: completed.filter((s) => s.difficulty === 'easy').length,
+      medium: completed.filter((s) => s.difficulty === 'medium').length,
+      hard: completed.filter((s) => s.difficulty === 'hard').length,
+    },
+    topPerformers: completed
+      .slice()
+      .sort((a, b) => a.moves - b.moves || a.completionSeconds - b.completionSeconds)
+      .slice(0, 5),
+  }
+}
+
 export function AnalyticsModal({ isOpen, onClose }: AnalyticsModalProps) {
   const [data, setData] = useState<AnalyticsData | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const loading = isOpen && !data && !error
+  const [source, setSource] = useState<'server' | 'local'>('local')
+  const loading = isOpen && data === null
 
   useEffect(() => {
     if (!isOpen) return
 
     let cancelled = false
 
-    fetch('http://localhost:3001/api/game/analytics')
+    const isBrowser = typeof window !== 'undefined'
+    const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    const apiUrl = (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ||
+      (isLocal
+        ? 'http://localhost:3001/api/game/analytics'
+        : 'https://cerevyn-memorymatch-2310991342-ajfmebfjcchrbhdx.indiasouthcentral-01.azurewebsites.net/api/game/analytics')
+
+    fetch(apiUrl, { signal: AbortSignal.timeout(3000) })
       .then((res) => {
-        if (!res.ok) throw new Error('Backend server is offline')
+        if (!res.ok) throw new Error('Server returned non-200')
         return res.json()
       })
       .then((json: AnalyticsData) => {
-        if (!cancelled) {
+        if (!cancelled && json.success) {
           setData(json)
+          setSource('server')
         }
       })
-      .catch((err: unknown) => {
+      .catch(() => {
         if (!cancelled) {
-          const message = err instanceof Error ? err.message : 'Could not connect to backend server'
-          setError(message)
+          // Graceful fallback to client localStorage data
+          setData(computeLocalAnalytics())
+          setSource('local')
         }
       })
 
@@ -65,7 +99,7 @@ export function AnalyticsModal({ isOpen, onClose }: AnalyticsModalProps) {
         <div className="analytics-modal-header">
           <div className="analytics-title">
             <BarChart3 size={20} className="analytics-icon" />
-            <h3>Global Server Telemetry & Analytics</h3>
+            <h3>Performance Telemetry & Analytics</h3>
           </div>
           <button type="button" className="close-btn" onClick={onClose} aria-label="Close">
             <X size={18} />
@@ -73,25 +107,37 @@ export function AnalyticsModal({ isOpen, onClose }: AnalyticsModalProps) {
         </div>
 
         <p className="analytics-subtitle">
-          Real-time metrics aggregated across all game sessions stored in the persistent database.
+          Real-time performance metrics aggregated across completed memory game rounds.
         </p>
+
+        <div style={{ margin: '8px 0 16px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
+          {source === 'server' ? (
+            <span style={{ color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(16, 185, 129, 0.1)', padding: '3px 8px', borderRadius: '4px' }}>
+              <Database size={14} /> Mode: Live Server Database Connected
+            </span>
+          ) : (
+            <span style={{ color: '#00e5ff', display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(0, 229, 255, 0.1)', padding: '3px 8px', borderRadius: '4px' }}>
+              <HardDrive size={14} /> Mode: Client Local Storage (Static Demo Fallback)
+            </span>
+          )}
+        </div>
 
         {loading ? (
           <div className="analytics-loading">
             <RefreshCw size={24} className="spin" />
-            <span>Fetching live server analytics...</span>
+            <span>Calculating metrics...</span>
           </div>
-        ) : error ? (
-          <div className="analytics-offline">
+        ) : data && data.totalRounds === 0 ? (
+          <div className="analytics-offline" style={{ textAlign: 'center', padding: '24px 12px' }}>
             <Database size={32} />
-            <p>Backend database offline (run <code>npm run server</code> to start).</p>
-            <span>The game is currently using browser client storage as a fallback.</span>
+            <p>No completed rounds recorded yet.</p>
+            <span>Play and complete at least one round to see your analytics and leaderboard!</span>
           </div>
         ) : data ? (
           <div className="analytics-body">
             <div className="analytics-metrics-grid">
               <div className="metric-card">
-                <span>Total Server Rounds</span>
+                <span>Total Rounds</span>
                 <strong>{data.totalRounds}</strong>
               </div>
               <div className="metric-card">
@@ -155,7 +201,7 @@ export function AnalyticsModal({ isOpen, onClose }: AnalyticsModalProps) {
             {data.topPerformers.length > 0 && (
               <div className="analytics-section">
                 <h4>
-                  <Trophy size={14} /> Server Leaderboard
+                  <Trophy size={14} /> Session Leaderboard (Top 5)
                 </h4>
                 <ul className="leaderboard-list">
                   {data.topPerformers.map((p, idx) => (

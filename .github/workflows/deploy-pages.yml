@@ -1,4 +1,4 @@
-name: Deploy Frontend to GitHub Pages
+name: Build, Test, and Deploy to GitHub Pages
 
 on:
   push:
@@ -7,43 +7,41 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: 'pages'
   cancel-in-progress: true
 
 jobs:
-  deploy-pages:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci || npm install
 
-      - name: Build frontend
+      - name: Code Quality - ESLint
+        run: npm run lint
+
+      - name: Code Quality - TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: Automated Tests - 26 Unit & Integration Tests
+        run: npm test
+
+      - name: Build Production Frontend & Server Bundle
         run: npm run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to GitHub Pages Branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: './dist'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

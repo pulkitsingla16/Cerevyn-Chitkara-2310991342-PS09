@@ -178,6 +178,7 @@ The deck generator accepts an optional numeric seed. When provided, a determinis
 │   ├── index.css                    # Global resets
 │   └── main.tsx                     # Entry point
 ├── tests/
+│   ├── api.test.ts                  # REST API & Telemetry endpoints (5 tests)
 │   ├── difficulty.test.ts           # Adaptive rules (7 tests)
 │   ├── game-ui.test.tsx             # UI lifecycle (4 tests)
 │   ├── shuffle.test.ts              # Deck generation (5 tests)
@@ -200,7 +201,8 @@ The deck generator accepts an optional numeric seed. When provided, a determinis
 | `storage.test.ts` | 4 | Persist + reload, malformed JSON fallback, quota failure, clear confirmation |
 | `timer-restart.test.tsx` | 1 | Timer starts on first click, resets to 0.0s on restart |
 | `game-ui.test.tsx` | 4 | Match persistence, mismatch hide delay, repeat-click guard, matched-card guard |
-| **Total** | **21** | |
+| `api.test.ts` | 5 | Backend health endpoint, rules metadata, session persistence, payload validation, global telemetry aggregates |
+| **Total** | **26** | **100% pass across 6 test suites** |
 
 ## Demonstration scenarios
 
