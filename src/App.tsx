@@ -94,8 +94,6 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
             bestScore={bestScore}
           />
 
-          <DifficultyNotice decision={lastDecision} currentDifficulty={difficulty} />
-
           <GameBoard
             cards={deck}
             difficulty={difficulty}
@@ -105,6 +103,8 @@ function App({ initialDifficulty = 'easy', initialSeed }: AppProps) {
             isPreviewing={isPreviewing}
             onClick={onCardClick}
           />
+
+          <DifficultyNotice decision={lastDecision} currentDifficulty={difficulty} />
 
           {status === 'won' ? (
             <WinPanel
