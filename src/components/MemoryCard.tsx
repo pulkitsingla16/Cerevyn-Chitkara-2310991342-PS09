@@ -1,5 +1,6 @@
 import { memo } from 'react'
 
+import cardBackImg from '../assets/card-back.png'
 import type { MemoryCard as MemoryCardType } from '../game/types'
 
 interface MemoryCardProps {
@@ -31,7 +32,7 @@ export const MemoryCard = memo(function MemoryCard({
         data-card-id={card.id}
       >
         <div className="card-face card-back">
-          <span className="card-back-mark" aria-hidden="true">?</span>
+          <img src={cardBackImg} alt="Cyber eye card back" className="card-back-image" />
         </div>
         <div className={`card-face card-front ${isMatched ? 'card-matched' : ''}`}>
           <span className="card-symbol" aria-hidden="true">{card.symbol}</span>
