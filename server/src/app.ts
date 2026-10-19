@@ -27,7 +27,6 @@ export interface SessionData {
   status: 'completed' | 'incomplete'
   seed?: number | string
   timestamp: string
-  clientIp?: string
 }
 
 function readSessions(): SessionData[] {
@@ -91,33 +90,44 @@ app.get('/api/game/sessions', (_req: Request, res: Response) => {
   })
 })
 
-// Post new completed game session
+// Post new completed game session with strict validation & privacy protection
 app.post('/api/game/session', (req: Request, res: Response) => {
   const body = req.body as Partial<SessionData>
+  const allowedDifficulties = ['easy', 'medium', 'hard']
 
   if (
     !body.id ||
+    typeof body.id !== 'string' ||
+    body.id.length > 100 ||
     !body.difficulty ||
+    !allowedDifficulties.includes(body.difficulty) ||
     typeof body.moves !== 'number' ||
+    !Number.isInteger(body.moves) ||
+    body.moves < 1 ||
+    body.moves > 500 ||
     typeof body.completedPairs !== 'number' ||
-    typeof body.completionSeconds !== 'number'
+    !Number.isInteger(body.completedPairs) ||
+    body.completedPairs < 1 ||
+    body.completedPairs > 20 ||
+    typeof body.completionSeconds !== 'number' ||
+    body.completionSeconds <= 0 ||
+    body.completionSeconds > 3600
   ) {
     return res.status(400).json({
       success: false,
-      error: 'Invalid session payload. Missing required fields.',
+      error: 'Invalid session payload. Difficulty must be easy/medium/hard; moves and seconds must be positive numbers within valid ranges.',
     })
   }
 
   const session: SessionData = {
-    id: String(body.id),
+    id: String(body.id).slice(0, 100),
     difficulty: body.difficulty as 'easy' | 'medium' | 'hard',
     moves: body.moves,
     completedPairs: body.completedPairs,
-    completionSeconds: body.completionSeconds,
-    status: body.status || 'completed',
-    seed: body.seed,
-    timestamp: body.timestamp || new Date().toISOString(),
-    clientIp: (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '127.0.0.1',
+    completionSeconds: Number(body.completionSeconds.toFixed(2)),
+    status: body.status === 'incomplete' ? 'incomplete' : 'completed',
+    seed: body.seed ? String(body.seed).slice(0, 50) : undefined,
+    timestamp: typeof body.timestamp === 'string' ? body.timestamp : new Date().toISOString(),
   }
 
   const sessions = readSessions()
@@ -165,8 +175,18 @@ app.get('/api/game/analytics', (_req: Request, res: Response) => {
   })
 })
 
-// Clear sessions
-app.delete('/api/game/sessions', (_req: Request, res: Response) => {
+// Clear sessions - restricted to authenticated admin or test environment
+app.delete('/api/game/sessions', (req: Request, res: Response) => {
+  const adminKey = req.headers['x-admin-key']
+  const isTest = process.env.NODE_ENV === 'test'
+
+  if (!isTest && adminKey !== (process.env.ADMIN_KEY || 'test-admin-key')) {
+    return res.status(403).json({
+      success: false,
+      error: 'Unauthorized. Clearing global server session history is restricted.',
+    })
+  }
+
   writeSessions([])
   res.json({
     success: true,

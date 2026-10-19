@@ -24,15 +24,28 @@ This project is a client-side memory matching game built with React, TypeScript,
 - `src/hooks/useSessionHistory.ts` wraps session persistence and storage error handling.
 - `src/components/*` render the 3D-flip card board, stats, session history, confetti celebration, instructions, and completion panels.
 
-### Persistence
+### Persistence and Privacy
 
 - `src/services/storage.ts` reads and writes versioned localStorage keys: `memory-match-history-v1` and `memory-match-best-v1`.
 - Stored records are validated with a type guard before use.
 - Malformed data and disabled storage fail closed without crashing the game.
+- Individual player history remains private to each visitor's browser.
 
-## Why a client-side app
+### Telemetry Backend (Optional Layer)
 
-The assessment requirements are fully satisfied without a Node.js backend or database. The game state is ephemeral per browser session, while anonymous history is kept locally in storage. This keeps the architecture simple and is a good foundation for a later API-backed version if the product grows.
+- `server/src/app.ts` provides an Express 5 REST API for non-identifying telemetry.
+- Endpoints:
+  - `GET /api/health` — System status and developer metadata.
+  - `GET /api/game/rules` — Static rules and adaptive threshold definitions.
+  - `POST /api/game/session` — Accepts completed game metrics (validated strictly; never stores or exposes client IP).
+  - `GET /api/game/analytics` — Computes global round averages, difficulty distributions, and leaderboard.
+- The client seamlessly operates without the backend when deployed to static CDNs (e.g., GitHub Pages).
+
+## Hybrid Architecture Rationale
+
+1. **Client Independence:** The core memory game, adaptive difficulty engine, and private score history run 100% in the client browser with zero mandatory dependencies on external APIs.
+2. **Optional Cloud Telemetry:** When deployed to Azure App Service or when the Node server is running locally, the game broadcasts anonymous metrics to generate multi-user statistics and leaderboards.
+3. **Resilience:** If the backend is offline or unreachable, the client continues uninterrupted, computing local analytics directly from `localStorage`.
 
 ## Deterministic behavior
 

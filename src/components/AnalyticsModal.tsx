@@ -50,17 +50,19 @@ function computeLocalAnalytics(): AnalyticsData {
   }
 }
 
+const isBrowser = typeof window !== 'undefined'
+const isGitHubPages = isBrowser && window.location.hostname.includes('github.io')
+
 export function AnalyticsModal({ isOpen, onClose }: AnalyticsModalProps) {
-  const [data, setData] = useState<AnalyticsData | null>(null)
+  const [data, setData] = useState<AnalyticsData | null>(() => (isGitHubPages ? computeLocalAnalytics() : null))
   const [source, setSource] = useState<'server' | 'local'>('local')
   const loading = isOpen && data === null
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen || isGitHubPages) return
 
     let cancelled = false
 
-    const isBrowser = typeof window !== 'undefined'
     const isLocal = isBrowser && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     const apiUrl = (import.meta as unknown as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL ||
       (isLocal

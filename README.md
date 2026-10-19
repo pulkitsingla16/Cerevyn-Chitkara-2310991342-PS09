@@ -107,7 +107,7 @@ docker run -p 3001:3001 memorymatch:latest
 
 1. Click a card to reveal it.
 2. Click a second card — if both symbols match, they stay face-up.
-3. If the symbols do not match, both cards flip back after 650 ms.
+3. If the symbols do not match, both cards flip back after 450 ms.
 4. A third click is blocked while two unmatched cards are displayed.
 5. Clicking the same card again or a matched card is ignored (no move counted).
 6. Match all pairs to complete the round.
@@ -216,23 +216,33 @@ To verify the required behaviors, run `npm run dev` and:
 
 ## Limitations
 
-- Browser localStorage is device- and browser-specific, user-editable, and not synchronized across devices.
-- This project intentionally avoids a backend database for the initial implementation.
-- The assessment scope boundary states model training and elaborate UI design are not expected.
+- Browser localStorage is device- and browser-specific and user-editable; individual player history remains private to each player's browser.
+- The optional Node.js Express server is used strictly for non-identifying aggregate telemetry and health monitoring; the core game runs 100% client-side without mandatory backend dependencies.
+- The assessment scope boundary states model training and complex multiplayer matchmaking are not expected.
 
-## Azure deployment summary
+## Architecture and Cloud Deployment Summary
 
-The project is designed for Azure Static Web Apps. The app is a static Vite bundle and does not require a server or database. See [docs/azure-plan.md](docs/azure-plan.md) for the full deployment procedure, security notes, and cost considerations.
+MemoryMatch supports dual deployment targets:
+1. **GitHub Pages CDN (Primary Live Target):**
+   - Live URL: `https://pulkitsingla16.github.io/Cerevyn-Chitkara-2310991342-PS09/`
+   - Operates 100% client-side with zero mandatory server dependencies.
+   - Session history and personal bests persist in private browser `localStorage`.
+   - The Telemetry modal runs in deterministic local-storage mode.
+2. **Azure App Service (Node.js 22 Backend):**
+   - Live URL: `https://cerevyn-memorymatch-2310991342-ajfmebfjcchrbhdx.indiasouthcentral-01.azurewebsites.net`
+   - Node.js 22 LTS container hosted in `indiasouthcentral` on Free F1 tier ($0.00/month).
+   - Serves REST endpoints for aggregate session analytics and health checks.
 
 ## Contributions and AI assistance
 
 This project was developed by **Pulkit Singla** as an individual submission for the Cerevyn × Chitkara University Round One Technical Assessment. AI coding assistants were used for boilerplate generation and code review. All architecture decisions, game logic, adaptive rules, and test scenarios were designed and validated by the candidate.
 
 ## Submission Deliverables & Links
-- **Demo Video URL (3-5 min screen recording):** [Provide your YouTube/Loom/Drive link here]
-- **Hosted Azure URL (Optional):** [Provide your Azure Static Web App URL if deployed]
-- **GitHub Actions Workflow Run:** [Available under the Actions tab of this repository]
-- **Final Release Tag / Commit:** `v1.0.0`
+- **Live Hosted Game (GitHub Pages):** https://pulkitsingla16.github.io/Cerevyn-Chitkara-2310991342-PS09/
+- **GitHub Repository:** https://github.com/pulkitsingla16/Cerevyn-Chitkara-2310991342-PS09
+- **Azure Cloud URL:** https://cerevyn-memorymatch-2310991342-ajfmebfjcchrbhdx.indiasouthcentral-01.azurewebsites.net
+- **Project Documentation (Word .docx):** [`docs/Project_Report_PS09_PulkitSingla_2310991342.docx`](docs/Project_Report_PS09_PulkitSingla_2310991342.docx)
+- **Video Presentation Script:** [`docs/video-presentation-script.md`](docs/video-presentation-script.md)
 
 ## License
 

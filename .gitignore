@@ -25,3 +25,9 @@ lerna-debug.log*
 .DS_Store
 *.swp
 *.swo
+
+# Runtime database & generated bundles
+dist-server/
+data/sessions.json
+scratch/
+*.zip

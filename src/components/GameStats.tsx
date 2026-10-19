@@ -65,7 +65,7 @@ export function GameStats({
             <Footprints size={14} className="stat-icon" />
             <span>Moves</span>
           </div>
-          <strong className="stat-value">{moves}</strong>
+          <strong className="stat-value" data-testid="moves-value">{moves}</strong>
         </div>
 
         <div className="stat-box">

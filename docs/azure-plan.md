@@ -1,80 +1,43 @@
-# Azure deployment plan
+# Cloud Deployment Plan & Architecture
 
 ## Author
 
-Pulkit Singla — 2310991342 — Computer Science
+Pulkit Singla — 2310991342 — Computer Science  
+Institution: Chitkara University  
+Repository: https://github.com/pulkitsingla16/Cerevyn-Chitkara-2310991342-PS09  
 
-## Architecture
+## Architecture Overview
 
-- GitHub repository with the source code and workflow configuration.
-- GitHub Actions CI/CD pipeline for linting, type checking, tests, and production builds.
-- Azure Static Web Apps hosts the Vite production bundle over HTTPS.
-- Browser-only state and localStorage keep the application lightweight and serverless.
+MemoryMatch utilizes a dual-cloud hosting strategy:
 
-## Deployment procedure
+1. **Primary Frontend CDN (GitHub Pages):**
+   - Live URL: https://pulkitsingla16.github.io/Cerevyn-Chitkara-2310991342-PS09/
+   - Serves the compiled React 19 + TypeScript Vite bundle.
+   - 100% uptime with no CPU minute restrictions, completely free of charge.
+   - Operates in self-contained mode using browser `localStorage` for private history and local analytics.
 
-### Prerequisites
+2. **Cloud Telemetry Backend (Azure App Service):**
+   - Live URL: https://cerevyn-memorymatch-2310991342-ajfmebfjcchrbhdx.indiasouthcentral-01.azurewebsites.net
+   - Node.js 22 LTS container deployed in the student-permitted `indiasouthcentral` region under the Free F1 Tier ($0.00/month).
+   - Runs pre-bundled ES module (`dist-server/server.js`) for sub-second native Node boot times.
+   - Provides RESTful APIs for global telemetry (`/api/game/analytics`) and health checks (`/api/health`).
 
-- A GitHub repository with the app committed and pushed.
-- A Microsoft Azure subscription (free tier is sufficient).
-- Permission to create or manage Azure Static Web Apps.
+## GitHub Actions CI/CD Pipelines
 
-### Creating the Azure resource
+The repository maintains three automated workflows:
 
-1. Open the Azure portal and create a new **Static Web App**.
-2. Choose the **Free** plan.
-3. Connect the GitHub repository (`pulkitsingla16/Cerevyn-Chitkara-2310991342-PS09`).
-4. Select the branch to deploy (e.g., `main`).
-5. Set the **app location** to `/` and the **output location** to `dist`.
+1. **`ci.yml` (Continuous Integration):**
+   - Triggers on every push and pull request to `main`.
+   - Runs `npm ci`, ESLint, TypeScript typecheck, the full 27-test Vitest suite, and production bundling.
+2. **`deploy-pages.yml` (GitHub Pages Deployment):**
+   - Automatically builds and publishes the production `dist/` directory to the `gh-pages` branch upon verified CI success.
+3. **`main_cerevyn-memorymatch-2310991342.yml` (Azure Deployment):**
+   - Triggers on push and on a scheduled morning cron (`30 0 * * *`) following the daily 00:00 UTC Azure Free F1 quota reset.
+   - Deploys the application artifact to Azure Web App via OIDC authentication.
 
-### Build settings
+## Security & Privacy Controls
 
-Use the default Vite build settings:
-- Build command: `npm run build`
-- Output location: `dist`
-- App location: `/`
-
-### Deployment flow
-
-1. Push to the deployment branch.
-2. GitHub Actions runs the CI workflow (lint, typecheck, test, build).
-3. Azure Static Web Apps picks up the build artifact from `dist/`.
-4. Confirm the site is accessible via the generated HTTPS URL.
-
-### Rollback
-
-Use the Azure portal or GitHub Actions history to redeploy a prior working build. Static Web Apps supports quick redeployment after a failed build or a bad release.
-
-## Security
-
-- No credentials or secrets are stored in source code.
-- Any required deployment secrets live in GitHub Actions encrypted secrets or Azure-managed identity settings.
-- HTTPS is enabled automatically by Azure Static Web Apps.
-- The app does not collect personal information beyond anonymous browser-local session history.
-- Dependency versions should be reviewed regularly and updated as needed.
-- A `.env.example` file documents configuration without exposing real values.
-
-## Monitoring
-
-- Review GitHub Actions build logs for CI failures.
-- Check Azure Static Web Apps deployment logs for runtime or routing issues.
-- Use browser-level error handling and any privacy-preserving logging that is appropriate for the project.
-
-## Cost management
-
-Azure Static Web Apps **Free** tier is sufficient for this project:
-- 100 GB bandwidth per month
-- 2 custom domains
-- No database or compute costs
-
-The project is a static site with no backend. There are no ongoing compute costs.
-
-## Storage and identity assumptions
-
-- **No database** — all game state is client-side.
-- **No authentication** — the game is anonymous.
-- **No secrets** — the only Azure secret is the deployment token, stored as a GitHub Actions secret.
-
-## Limitations
-
-Browser localStorage is specific to a single browser and device. It is user-editable and is not synchronized across devices or shared sessions. This is acceptable for anonymous local session history but should not be treated as a secure or shared storage layer.
+- **Zero IP Collection:** Neither client nor server collects or stores IP addresses or personal identifiers.
+- **Private Browser Storage:** Individual game history is stored strictly in the visitor's local browser storage.
+- **Restricted Server Operations:** Clearing global server history is restricted (`x-admin-key`), ensuring no public visitor can erase shared analytics.
+- **Validated Payloads:** All game session submissions are strictly validated for allowed difficulty levels and sensible numeric ranges.

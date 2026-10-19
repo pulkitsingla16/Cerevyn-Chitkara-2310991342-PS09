@@ -154,6 +154,7 @@ export function useMemoryGame(initialDifficulty: Difficulty = 'easy', initialSee
       setMatchedIds([])
       setMoves(0)
       setIsNewBest(false)
+      setLastDecision(null)
       movesRef.current = 0
       selectedRef.current = []
       matchedRef.current = []
