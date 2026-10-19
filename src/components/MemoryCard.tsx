@@ -31,8 +31,7 @@ export const MemoryCard = memo(function MemoryCard({
         data-card-id={card.id}
       >
         <div className="card-face card-back">
-          <div className="card-back-pattern" aria-hidden="true" />
-          <span className="card-back-icon" aria-hidden="true">★</span>
+          <span className="card-back-mark" aria-hidden="true">?</span>
         </div>
         <div className={`card-face card-front ${isMatched ? 'card-matched' : ''}`}>
           <span className="card-symbol" aria-hidden="true">{card.symbol}</span>
